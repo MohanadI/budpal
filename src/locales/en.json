@@ -1,0 +1,101 @@
+{
+  "common": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "title": "Title",
+    "amount": "Amount",
+    "currency": "Currency",
+    "planned": "Planned",
+    "actual": "Actual",
+    "remaining": "Remaining",
+    "date": "Date",
+    "table": "Table",
+    "chart": "Chart",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "navigation": {
+    "fixedExpenses": "Fixed Expenses",
+    "dailyExpenses": "Daily Expenses",
+    "debts": "Debts",
+    "income": "Income",
+    "investments": "Investments",
+    "overview": "Overview"
+  },
+  "fixedExpenses": {
+    "title": "Fixed Expenses",
+    "addExpense": "Add Fixed Expense",
+    "editExpense": "Edit Fixed Expense",
+    "expenseTitle": "Expense Title",
+    "expenseDate": "Expense Date",
+    "plannedBudget": "Planned Budget",
+    "actualSpent": "Actual Spent",
+    "noExpenses": "No fixed expenses yet",
+    "addFirstExpense": "Add your first fixed expense"
+  },
+  "dailyExpenses": {
+    "title": "Daily Expenses",
+    "addExpense": "Add Daily Expense",
+    "editExpense": "Edit Daily Expense",
+    "expenseTitle": "Expense Title",
+    "plannedAmount": "Planned Amount",
+    "actualAmount": "Actual Amount",
+    "remainingAmount": "Remaining Amount",
+    "noExpenses": "No daily expenses yet",
+    "addFirstExpense": "Add your first daily expense"
+  },
+  "debts": {
+    "title": "Debts",
+    "addDebt": "Add Debt",
+    "editDebt": "Edit Debt",
+    "debtTitle": "Debt Title",
+    "creditor": "Creditor",
+    "dueDate": "Due Date",
+    "totalDebt": "Total Debt",
+    "paidSoFar": "Paid So Far",
+    "noDebts": "No debts recorded yet",
+    "addFirstDebt": "Add your first debt"
+  },
+  "income": {
+    "title": "Income",
+    "addIncome": "Add Income",
+    "editIncome": "Edit Income",
+    "incomeSource": "Income Source",
+    "expectedIncome": "Expected Income",
+    "actualIncome": "Actual Income",
+    "noIncome": "No income recorded yet",
+    "addFirstIncome": "Add your first income source"
+  },
+  "investments": {
+    "title": "Investments",
+    "addInvestment": "Add Investment",
+    "editInvestment": "Edit Investment",
+    "investmentName": "Investment Name",
+    "investmentDate": "Investment Date",
+    "plannedAmount": "Planned Amount",
+    "currentValue": "Current Value",
+    "noInvestments": "No investments recorded yet",
+    "addFirstInvestment": "Add your first investment"
+  },
+  "overview": {
+    "title": "Overview",
+    "totalPlanned": "Total Planned",
+    "totalActual": "Total Actual",
+    "difference": "Difference",
+    "summary": "Financial Summary",
+    "byCategory": "By Category",
+    "allCategories": "All Categories"
+  },
+  "currencies": {
+    "USD": "US Dollar",
+    "JOD": "Jordanian Dinar",
+    "EUR": "Euro",
+    "GBP": "British Pound",
+    "SAR": "Saudi Riyal",
+    "AED": "UAE Dirham"
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "common": {
+    "add": "إضافة",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "title": "العنوان",
+    "amount": "المبلغ",
+    "currency": "العملة",
+    "planned": "مخطط",
+    "actual": "فعلي",
+    "remaining": "متبقي",
+    "date": "التاريخ",
+    "table": "جدول",
+    "chart": "رسم بياني",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح"
+  },
+  "navigation": {
+    "fixedExpenses": "المصروفات الثابتة",
+    "dailyExpenses": "المصروفات اليومية",
+    "debts": "الديون",
+    "income": "الدخل",
+    "investments": "الاستثمارات",
+    "overview": "نظرة عامة"
+  },
+  "fixedExpenses": {
+    "title": "المصروفات الثابتة",
+    "addExpense": "إضافة مصروف ثابت",
+    "editExpense": "تعديل المصروف الثابت",
+    "expenseTitle": "عنوان المصروف",
+    "expenseDate": "تاريخ المصروف",
+    "plannedBudget": "الميزانية المخططة",
+    "actualSpent": "المبلغ المنفق فعلياً",
+    "noExpenses": "لا توجد مصروفات ثابتة بعد",
+    "addFirstExpense": "أضف أول مصروف ثابت"
+  },
+  "dailyExpenses": {
+    "title": "المصروفات اليومية",
+    "addExpense": "إضافة مصروف يومي",
+    "editExpense": "تعديل المصروف اليومي",
+    "expenseTitle": "عنوان المصروف",
+    "plannedAmount": "المبلغ المخطط",
+    "actualAmount": "المبلغ الفعلي",
+    "remainingAmount": "المبلغ المتبقي",
+    "noExpenses": "لا توجد مصروفات يومية بعد",
+    "addFirstExpense": "أضف أول مصروف يومي"
+  },
+  "debts": {
+    "title": "الديون",
+    "addDebt": "إضافة دين",
+    "editDebt": "تعديل الدين",
+    "debtTitle": "عنوان الدين",
+    "creditor": "الدائن",
+    "dueDate": "تاريخ الاستحقاق",
+    "totalDebt": "إجمالي الدين",
+    "paidSoFar": "المدفوع حتى الآن",
+    "noDebts": "لا توجد ديون مسجلة بعد",
+    "addFirstDebt": "أضف أول دين"
+  },
+  "income": {
+    "title": "الدخل",
+    "addIncome": "إضافة مصدر دخل",
+    "editIncome": "تعديل مصدر الدخل",
+    "incomeSource": "مصدر الدخل",
+    "expectedIncome": "الدخل المتوقع",
+    "actualIncome": "الدخل الفعلي",
+    "noIncome": "لا توجد مصادر دخل مسجلة بعد",
+    "addFirstIncome": "أضف أول مصدر دخل"
+  },
+  "investments": {
+    "title": "الاستثمارات",
+    "addInvestment": "إضافة استثمار",
+    "editInvestment": "تعديل الاستثمار",
+    "investmentName": "اسم الاستثمار",
+    "investmentDate": "تاريخ الاستثمار",
+    "plannedAmount": "المبلغ المخطط",
+    "currentValue": "القيمة الحالية",
+    "noInvestments": "لا توجد استثمارات مسجلة بعد",
+    "addFirstInvestment": "أضف أول استثمار"
+  },
+  "overview": {
+    "title": "النظرة العامة",
+    "totalPlanned": "إجمالي المخطط",
+    "totalActual": "إجمالي الفعلي",
+    "difference": "الفرق",
+    "summary": "ملخص مالي",
+    "byCategory": "حسب الفئة",
+    "allCategories": "جميع الفئات"
+  },
+  "currencies": {
+    "USD": "الدولار الأمريكي",
+    "JOD": "الدينار الأردني",
+    "EUR": "اليورو",
+    "GBP": "الجنيه الإسترليني",
+    "SAR": "الريال السعودي",
+    "AED": "الدرهم الإماراتي"
+  }
+}
