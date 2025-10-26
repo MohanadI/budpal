@@ -116,5 +116,16 @@
     "registerButton": "إنشاء حساب",
     "haveAccount": "لديك حساب بالفعل؟",
     "loginLink": "تسجيل الدخول"
+  },
+  "settings": {
+    "logout": "تسجيل الخروج",
+    "logoutTitle": "تسجيل الخروج",
+    "logoutMessage": "هل أنت متأكد من رغبتك في تسجيل الخروج؟",
+    "language": "اللغة",
+    "changeLanguage": "تغيير اللغة",
+    "theme": "المظهر",
+    "lightTheme": "فاتح",
+    "darkTheme": "داكن",
+    "autoTheme": "تلقائي"
   }
 }

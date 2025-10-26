@@ -116,5 +116,16 @@
     "registerButton": "Register",
     "haveAccount": "Already have an account?",
     "loginLink": "Login"
+  },
+  "settings": {
+    "logout": "Logout",
+    "logoutTitle": "Logout",
+    "logoutMessage": "Are you sure you want to logout?",
+    "language": "Language",
+    "changeLanguage": "Change Language",
+    "theme": "Theme",
+    "lightTheme": "Light",
+    "darkTheme": "Dark",
+    "autoTheme": "Auto"
   }
 }

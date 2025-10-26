@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { TextInput, Button, Text, Surface, HelperText } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
+import { MaterialIcons } from '@expo/vector-icons';
 import { authService } from '../services/auth';
 import { useStore } from '../services/store';
+import { useTheme } from '../theme/ThemeContext';
+import LanguageToggle from '../components/LanguageToggle';
+import ThemeToggle from '../components/ThemeToggle';
 
 interface RegisterScreenProps {
   navigation: any;
@@ -11,6 +16,7 @@ interface RegisterScreenProps {
 
 export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -62,141 +68,218 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <LinearGradient
+      colors={[theme.gradientStart, theme.gradientEnd]}
+      style={styles.gradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Surface style={styles.surface}>
-          <Text variant="headlineLarge" style={styles.title}>
-            {t('register.title') || 'Create Account'}
-          </Text>
-          <Text variant="bodyMedium" style={styles.subtitle}>
-            {t('register.subtitle') || 'Start managing your finances today'}
-          </Text>
-
-          <TextInput
-            label={t('register.email') || 'Email'}
-            value={email}
-            onChangeText={setEmail}
-            mode="outlined"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-            style={styles.input}
-            error={!!error && !email}
-          />
-
-          <TextInput
-            label={t('register.password') || 'Password'}
-            value={password}
-            onChangeText={setPassword}
-            mode="outlined"
-            secureTextEntry={!showPassword}
-            autoCapitalize="none"
-            autoComplete="password"
-            style={styles.input}
-            error={!!error && !password}
-            right={
-              <TextInput.Icon
-                icon={showPassword ? 'eye-off' : 'eye'}
-                onPress={() => setShowPassword(!showPassword)}
-              />
-            }
-          />
-
-          <TextInput
-            label={t('register.confirmPassword') || 'Confirm Password'}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            mode="outlined"
-            secureTextEntry={!showConfirmPassword}
-            autoCapitalize="none"
-            autoComplete="password"
-            style={styles.input}
-            error={!!error && !confirmPassword}
-            right={
-              <TextInput.Icon
-                icon={showConfirmPassword ? 'eye-off' : 'eye'}
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-              />
-            }
-          />
-
-          {error ? (
-            <HelperText type="error" visible={!!error} style={styles.error}>
-              {error}
-            </HelperText>
-          ) : null}
-
-          <Button
-            mode="contained"
-            onPress={handleRegister}
-            loading={loading}
-            disabled={loading}
-            style={styles.button}
-          >
-            {t('register.registerButton') || 'Register'}
-          </Button>
-
-          <View style={styles.loginContainer}>
-            <Text variant="bodyMedium">
-              {t('register.haveAccount') || 'Already have an account? '}
-            </Text>
-            <Button
-              mode="text"
-              onPress={() => navigation.navigate('Login')}
-              disabled={loading}
-            >
-              {t('register.loginLink') || 'Login'}
-            </Button>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.topBar}>
+            <ThemeToggle />
+            <LanguageToggle />
           </View>
-        </Surface>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          
+          <View style={styles.iconContainer}>
+            <View style={[styles.iconWrapper, { backgroundColor: theme.surface }]}>
+              <MaterialIcons name="person-add" size={64} color={theme.primary} />
+            </View>
+          </View>
+
+          <Surface style={[styles.surface, { backgroundColor: theme.surface }]}>
+            <Text variant="headlineLarge" style={[styles.title, { color: theme.text }]}>
+              {t('register.title') || 'إنشاء حساب جديد'}
+            </Text>
+            <Text variant="bodyMedium" style={[styles.subtitle, { color: theme.textSecondary }]}>
+              {t('register.subtitle') || 'ابدأ بإدارة أموالك اليوم'}
+            </Text>
+
+            <TextInput
+              label={t('register.email') || 'البريد الإلكتروني'}
+              value={email}
+              onChangeText={setEmail}
+              mode="outlined"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+              style={styles.input}
+              error={!!error && !email}
+              theme={{ colors: { primary: theme.primary } }}
+              outlineColor={theme.border}
+              activeOutlineColor={theme.primary}
+              textColor={theme.text}
+            />
+
+            <TextInput
+              label={t('register.password') || 'كلمة المرور'}
+              value={password}
+              onChangeText={setPassword}
+              mode="outlined"
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoComplete="password"
+              style={styles.input}
+              error={!!error && !password}
+              theme={{ colors: { primary: theme.primary } }}
+              outlineColor={theme.border}
+              activeOutlineColor={theme.primary}
+              textColor={theme.text}
+              right={
+                <TextInput.Icon
+                  icon={showPassword ? 'eye-off' : 'eye'}
+                  onPress={() => setShowPassword(!showPassword)}
+                  color={theme.textSecondary}
+                />
+              }
+            />
+
+            <TextInput
+              label={t('register.confirmPassword') || 'تأكيد كلمة المرور'}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              mode="outlined"
+              secureTextEntry={!showConfirmPassword}
+              autoCapitalize="none"
+              autoComplete="password"
+              style={styles.input}
+              error={!!error && !confirmPassword}
+              theme={{ colors: { primary: theme.primary } }}
+              outlineColor={theme.border}
+              activeOutlineColor={theme.primary}
+              textColor={theme.text}
+              right={
+                <TextInput.Icon
+                  icon={showConfirmPassword ? 'eye-off' : 'eye'}
+                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                  color={theme.textSecondary}
+                />
+              }
+            />
+
+            {error ? (
+              <HelperText type="error" visible={!!error} style={styles.error}>
+                {error}
+              </HelperText>
+            ) : null}
+
+            <Button
+              mode="contained"
+              onPress={handleRegister}
+              loading={loading}
+              disabled={loading}
+              style={[styles.button, { backgroundColor: theme.primary }]}
+              buttonColor={theme.primary}
+              textColor="#FFFFFF"
+            >
+              {t('register.registerButton') || 'إنشاء حساب'}
+            </Button>
+
+            <View style={styles.loginContainer}>
+              <Text variant="bodyMedium" style={{ color: theme.textSecondary }}>
+                {t('register.haveAccount') || 'لديك حساب بالفعل؟ '}
+              </Text>
+              <Button
+                mode="text"
+                onPress={() => navigation.navigate('Login')}
+                disabled={loading}
+                textColor={theme.primary}
+              >
+                {t('register.loginLink') || 'تسجيل الدخول'}
+              </Button>
+            </View>
+          </Surface>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 16,
+    padding: 20,
+  },
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 8,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  iconWrapper: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   surface: {
-    padding: 24,
-    borderRadius: 12,
-    elevation: 4,
+    padding: 28,
+    borderRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 10,
   },
   title: {
     textAlign: 'center',
     marginBottom: 8,
     fontWeight: 'bold',
+    writingDirection: 'auto',
+    fontSize: 28,
   },
   subtitle: {
     textAlign: 'center',
     marginBottom: 32,
-    color: '#666',
+    writingDirection: 'auto',
+    fontSize: 16,
   },
   input: {
     marginBottom: 16,
+    writingDirection: 'auto',
+    backgroundColor: 'transparent',
   },
   error: {
     marginBottom: 8,
+    writingDirection: 'auto',
   },
   button: {
-    marginTop: 8,
-    paddingVertical: 6,
+    marginTop: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 20,
+    flexWrap: 'wrap',
   },
 });
 

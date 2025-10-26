@@ -83,7 +83,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   investments: [],
   overviewItems: [],
   currentView: 'table',
-  language: 'en',
+  language: 'ar', // Default to Arabic
   isLoading: false,
   error: null,
   
@@ -102,7 +102,13 @@ export const useAppStore = create<AppState>((set, get) => ({
   
   // UI Actions
   setCurrentView: (view) => set({ currentView: view }),
-  setLanguage: (lang) => set({ language: lang }),
+  setLanguage: (lang) => {
+    set({ language: lang });
+    // Update i18n when language changes in store
+    import('../utils/i18n').then((i18n) => {
+      i18n.default.changeLanguage(lang);
+    });
+  },
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   

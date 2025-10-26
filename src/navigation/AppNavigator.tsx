@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { View, StyleSheet, I18nManager } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -6,7 +7,11 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../services/store';
 import { authService } from '../services/auth';
+import { useTheme } from '../theme/ThemeContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import LanguageToggle from '../components/LanguageToggle';
+import LogoutButton from '../components/LogoutButton';
+import ThemeToggle from '../components/ThemeToggle';
 
 // Import screens
 import LoginScreen from '../screens/LoginScreen';
@@ -22,8 +27,19 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const TabNavigator = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { language } = useAppStore();
+  const { theme, isDark } = useTheme();
+  const isRTL = i18n.language === 'ar';
+
+  // Update RTL layout when language changes
+  useEffect(() => {
+    if (I18nManager.isRTL !== isRTL) {
+      I18nManager.allowRTL(isRTL);
+      I18nManager.forceRTL(isRTL);
+      // Note: In Expo, RTL changes take effect immediately
+    }
+  }, [isRTL]);
 
   return (
     <Tab.Navigator
@@ -56,17 +72,45 @@ const TabNavigator = () => {
 
           return <MaterialIcons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#2196F3',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: theme.tabBarActive,
+        tabBarInactiveTintColor: theme.tabBarInactive,
         headerStyle: {
-          backgroundColor: '#2196F3',
+          backgroundColor: theme.headerBackground,
+          elevation: 4,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
         },
-        headerTintColor: '#fff',
+        headerTintColor: theme.headerText,
         headerTitleStyle: {
           fontWeight: 'bold',
+          fontSize: 18,
         },
+        headerRight: () => (
+          <View style={[styles.headerRight, isRTL && styles.headerRightRTL]}>
+            <ThemeToggle />
+            <LanguageToggle iconOnly />
+            <LogoutButton />
+          </View>
+        ),
         tabBarStyle: {
-          direction: language === 'ar' ? 'rtl' : 'ltr',
+          direction: isRTL ? 'rtl' : 'ltr',
+          backgroundColor: theme.tabBarBackground,
+          borderTopColor: theme.border,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          textAlign: isRTL ? 'right' : 'left',
+          fontSize: 12,
+          fontWeight: '600',
         },
       })}
     >
@@ -105,11 +149,18 @@ const TabNavigator = () => {
 };
 
 const AuthStack = () => {
+  const { theme } = useTheme();
+  
   return (
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#2196F3',
+          backgroundColor: theme.primary,
+          elevation: 4,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
         },
         headerTintColor: '#fff',
         headerTitleStyle: {
@@ -166,5 +217,18 @@ const AppNavigator = () => {
     </NavigationContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  headerRightRTL: {
+    flexDirection: 'row-reverse',
+    marginRight: 0,
+    marginLeft: 8,
+  },
+});
 
 export default AppNavigator;

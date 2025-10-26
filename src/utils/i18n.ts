@@ -17,7 +17,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: Localization.getLocales()[0]?.languageCode?.startsWith('ar') ? 'ar' : 'en',
+    lng: 'ar', // Default to Arabic
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false
