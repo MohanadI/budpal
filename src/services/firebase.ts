@@ -14,9 +14,18 @@ import {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+// Initialize Auth
+// Firebase Auth automatically persists authentication state in Expo/React Native
+// using the platform's secure storage mechanisms
 const auth = getAuth(app);
 
-// Firestore collections
+// Helper function to get user-specific collection path
+const getUserCollection = (userId: string, collectionName: string) => {
+  return `users/${userId}/${collectionName}`;
+};
+
+// Collection names
 const COLLECTIONS = {
   FIXED_EXPENSES: 'fixedExpenses',
   DAILY_EXPENSES: 'dailyExpenses',
@@ -28,9 +37,18 @@ const COLLECTIONS = {
 
 // Generic CRUD operations
 class FirebaseService {
+  // Get current user ID
+  private getCurrentUserId(): string {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('No authenticated user');
+    }
+    return user.uid;
+  }
   // Create
   async createFixedExpense(data: Omit<FixedExpense, 'id' | 'createdAt' | 'updatedAt'>) {
-    const docRef = await addDoc(collection(db, COLLECTIONS.FIXED_EXPENSES), {
+    const userId = this.getCurrentUserId();
+    const docRef = await addDoc(collection(db, getUserCollection(userId, COLLECTIONS.FIXED_EXPENSES)), {
       ...data,
       createdAt: Timestamp.fromDate(new Date()),
       updatedAt: Timestamp.fromDate(new Date())
@@ -39,8 +57,9 @@ class FirebaseService {
   }
 
   async createDailyExpense(data: Omit<DailyExpense, 'id' | 'createdAt' | 'updatedAt' | 'remaining'>) {
+    const userId = this.getCurrentUserId();
     const remaining = data.planned - data.actual;
-    const docRef = await addDoc(collection(db, COLLECTIONS.DAILY_EXPENSES), {
+    const docRef = await addDoc(collection(db, getUserCollection(userId, COLLECTIONS.DAILY_EXPENSES)), {
       ...data,
       remaining,
       createdAt: Timestamp.fromDate(new Date()),
@@ -50,7 +69,8 @@ class FirebaseService {
   }
 
   async createDebt(data: Omit<Debt, 'id' | 'createdAt' | 'updatedAt'>) {
-    const docRef = await addDoc(collection(db, COLLECTIONS.DEBTS), {
+    const userId = this.getCurrentUserId();
+    const docRef = await addDoc(collection(db, getUserCollection(userId, COLLECTIONS.DEBTS)), {
       ...data,
       createdAt: Timestamp.fromDate(new Date()),
       updatedAt: Timestamp.fromDate(new Date())
@@ -59,7 +79,8 @@ class FirebaseService {
   }
 
   async createIncome(data: Omit<Income, 'id' | 'createdAt' | 'updatedAt'>) {
-    const docRef = await addDoc(collection(db, COLLECTIONS.INCOME), {
+    const userId = this.getCurrentUserId();
+    const docRef = await addDoc(collection(db, getUserCollection(userId, COLLECTIONS.INCOME)), {
       ...data,
       createdAt: Timestamp.fromDate(new Date()),
       updatedAt: Timestamp.fromDate(new Date())
@@ -68,7 +89,8 @@ class FirebaseService {
   }
 
   async createInvestment(data: Omit<Investment, 'id' | 'createdAt' | 'updatedAt'>) {
-    const docRef = await addDoc(collection(db, COLLECTIONS.INVESTMENTS), {
+    const userId = this.getCurrentUserId();
+    const docRef = await addDoc(collection(db, getUserCollection(userId, COLLECTIONS.INVESTMENTS)), {
       ...data,
       createdAt: Timestamp.fromDate(new Date()),
       updatedAt: Timestamp.fromDate(new Date())
@@ -78,7 +100,8 @@ class FirebaseService {
 
   // Read
   async getFixedExpenses(): Promise<FixedExpense[]> {
-    const snapshot = await getDocs(collection(db, COLLECTIONS.FIXED_EXPENSES));
+    const userId = this.getCurrentUserId();
+    const snapshot = await getDocs(collection(db, getUserCollection(userId, COLLECTIONS.FIXED_EXPENSES)));
     return snapshot.docs.map(docSnap => {
       const data = docSnap.data();
       return {
@@ -91,7 +114,8 @@ class FirebaseService {
   }
 
   async getDailyExpenses(): Promise<DailyExpense[]> {
-    const snapshot = await getDocs(collection(db, COLLECTIONS.DAILY_EXPENSES));
+    const userId = this.getCurrentUserId();
+    const snapshot = await getDocs(collection(db, getUserCollection(userId, COLLECTIONS.DAILY_EXPENSES)));
     return snapshot.docs.map(docSnap => {
       const data = docSnap.data();
       return {
@@ -104,7 +128,8 @@ class FirebaseService {
   }
 
   async getDebts(): Promise<Debt[]> {
-    const snapshot = await getDocs(collection(db, COLLECTIONS.DEBTS));
+    const userId = this.getCurrentUserId();
+    const snapshot = await getDocs(collection(db, getUserCollection(userId, COLLECTIONS.DEBTS)));
     return snapshot.docs.map(docSnap => {
       const data = docSnap.data();
       return {
@@ -117,7 +142,8 @@ class FirebaseService {
   }
 
   async getIncome(): Promise<Income[]> {
-    const snapshot = await getDocs(collection(db, COLLECTIONS.INCOME));
+    const userId = this.getCurrentUserId();
+    const snapshot = await getDocs(collection(db, getUserCollection(userId, COLLECTIONS.INCOME)));
     return snapshot.docs.map(docSnap => {
       const data = docSnap.data();
       return {
@@ -130,7 +156,8 @@ class FirebaseService {
   }
 
   async getInvestments(): Promise<Investment[]> {
-    const snapshot = await getDocs(collection(db, COLLECTIONS.INVESTMENTS));
+    const userId = this.getCurrentUserId();
+    const snapshot = await getDocs(collection(db, getUserCollection(userId, COLLECTIONS.INVESTMENTS)));
     return snapshot.docs.map(docSnap => {
       const data = docSnap.data();
       return {
@@ -144,7 +171,8 @@ class FirebaseService {
 
   // Update
   async updateFixedExpense(id: string, data: Partial<FixedExpense>) {
-    const docRef = doc(db, COLLECTIONS.FIXED_EXPENSES, id);
+    const userId = this.getCurrentUserId();
+    const docRef = doc(db, getUserCollection(userId, COLLECTIONS.FIXED_EXPENSES), id);
     await updateDoc(docRef, {
       ...data,
       updatedAt: Timestamp.fromDate(new Date())
@@ -152,21 +180,23 @@ class FirebaseService {
   }
 
   async updateDailyExpense(id: string, data: Partial<DailyExpense>) {
+    const userId = this.getCurrentUserId();
     const updateData: any = { ...data, updatedAt: Timestamp.fromDate(new Date()) };
     if (data.planned !== undefined || data.actual !== undefined) {
-      const docRef = doc(db, COLLECTIONS.DAILY_EXPENSES, id);
+      const docRef = doc(db, getUserCollection(userId, COLLECTIONS.DAILY_EXPENSES), id);
       const currentDoc = await getDoc(docRef);
       const currentData = currentDoc.data();
       const planned = data.planned ?? currentData?.planned ?? 0;
       const actual = data.actual ?? currentData?.actual ?? 0;
       updateData.remaining = planned - actual;
     }
-    const docRef = doc(db, COLLECTIONS.DAILY_EXPENSES, id);
+    const docRef = doc(db, getUserCollection(userId, COLLECTIONS.DAILY_EXPENSES), id);
     await updateDoc(docRef, updateData);
   }
 
   async updateDebt(id: string, data: Partial<Debt>) {
-    const docRef = doc(db, COLLECTIONS.DEBTS, id);
+    const userId = this.getCurrentUserId();
+    const docRef = doc(db, getUserCollection(userId, COLLECTIONS.DEBTS), id);
     await updateDoc(docRef, {
       ...data,
       updatedAt: Timestamp.fromDate(new Date())
@@ -174,7 +204,8 @@ class FirebaseService {
   }
 
   async updateIncome(id: string, data: Partial<Income>) {
-    const docRef = doc(db, COLLECTIONS.INCOME, id);
+    const userId = this.getCurrentUserId();
+    const docRef = doc(db, getUserCollection(userId, COLLECTIONS.INCOME), id);
     await updateDoc(docRef, {
       ...data,
       updatedAt: Timestamp.fromDate(new Date())
@@ -182,7 +213,8 @@ class FirebaseService {
   }
 
   async updateInvestment(id: string, data: Partial<Investment>) {
-    const docRef = doc(db, COLLECTIONS.INVESTMENTS, id);
+    const userId = this.getCurrentUserId();
+    const docRef = doc(db, getUserCollection(userId, COLLECTIONS.INVESTMENTS), id);
     await updateDoc(docRef, {
       ...data,
       updatedAt: Timestamp.fromDate(new Date())
@@ -191,27 +223,32 @@ class FirebaseService {
 
   // Delete
   async deleteFixedExpense(id: string) {
-    const docRef = doc(db, COLLECTIONS.FIXED_EXPENSES, id);
+    const userId = this.getCurrentUserId();
+    const docRef = doc(db, getUserCollection(userId, COLLECTIONS.FIXED_EXPENSES), id);
     await deleteDoc(docRef);
   }
 
   async deleteDailyExpense(id: string) {
-    const docRef = doc(db, COLLECTIONS.DAILY_EXPENSES, id);
+    const userId = this.getCurrentUserId();
+    const docRef = doc(db, getUserCollection(userId, COLLECTIONS.DAILY_EXPENSES), id);
     await deleteDoc(docRef);
   }
 
   async deleteDebt(id: string) {
-    const docRef = doc(db, COLLECTIONS.DEBTS, id);
+    const userId = this.getCurrentUserId();
+    const docRef = doc(db, getUserCollection(userId, COLLECTIONS.DEBTS), id);
     await deleteDoc(docRef);
   }
 
   async deleteIncome(id: string) {
-    const docRef = doc(db, COLLECTIONS.INCOME, id);
+    const userId = this.getCurrentUserId();
+    const docRef = doc(db, getUserCollection(userId, COLLECTIONS.INCOME), id);
     await deleteDoc(docRef);
   }
 
   async deleteInvestment(id: string) {
-    const docRef = doc(db, COLLECTIONS.INVESTMENTS, id);
+    const userId = this.getCurrentUserId();
+    const docRef = doc(db, getUserCollection(userId, COLLECTIONS.INVESTMENTS), id);
     await deleteDoc(docRef);
   }
 

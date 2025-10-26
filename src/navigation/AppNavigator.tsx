@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../services/store';
+import { authService } from '../services/auth';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 // Import screens
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
 import FixedExpensesScreen from '../screens/FixedExpensesScreen';
 import DailyExpensesScreen from '../screens/DailyExpensesScreen';
 import DebtsScreen from '../screens/DebtsScreen';
@@ -100,11 +104,64 @@ const TabNavigator = () => {
   );
 };
 
+const AuthStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#2196F3',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+    >
+      <Stack.Screen 
+        name="Login" 
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="Register" 
+        component={RegisterScreen}
+        options={{ title: 'Create Account' }}
+      />
+    </Stack.Navigator>
+  );
+};
+
 const AppNavigator = () => {
+  const { isAuthenticated, setUser, clearUser } = useAppStore();
+  const [initializing, setInitializing] = React.useState(true);
+
+  useEffect(() => {
+    // Subscribe to auth state changes
+    const unsubscribe = authService.onAuthStateChange((user) => {
+      if (user) {
+        setUser(authService.toAuthUser(user));
+      } else {
+        clearUser();
+      }
+      if (initializing) setInitializing(false);
+    });
+
+    // Cleanup subscription
+    return unsubscribe;
+  }, []);
+
+  if (initializing) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Main" component={TabNavigator} />
+        {isAuthenticated ? (
+          <Stack.Screen name="Main" component={TabNavigator} />
+        ) : (
+          <Stack.Screen name="Auth" component={AuthStack} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

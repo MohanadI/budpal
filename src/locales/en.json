@@ -97,5 +97,24 @@
     "GBP": "British Pound",
     "SAR": "Saudi Riyal",
     "AED": "UAE Dirham"
+  },
+  "login": {
+    "title": "Welcome to BudPal",
+    "subtitle": "Manage your finances easily",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Login",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Register"
+  },
+  "register": {
+    "title": "Create Account",
+    "subtitle": "Start managing your finances today",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "registerButton": "Register",
+    "haveAccount": "Already have an account?",
+    "loginLink": "Login"
   }
 }

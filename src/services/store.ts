@@ -10,8 +10,13 @@ import {
   Language 
 } from '../types';
 import { firebaseService } from './firebase';
+import { AuthUser } from './auth';
 
 interface AppState {
+  // Auth State
+  user: AuthUser | null;
+  isAuthenticated: boolean;
+  
   // Data
   fixedExpenses: FixedExpense[];
   dailyExpenses: DailyExpense[];
@@ -25,6 +30,10 @@ interface AppState {
   language: Language;
   isLoading: boolean;
   error: string | null;
+  
+  // Auth Actions
+  setUser: (user: AuthUser | null) => void;
+  clearUser: () => void;
   
   // Actions
   setCurrentView: (view: ViewType) => void;
@@ -65,6 +74,8 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set, get) => ({
   // Initial state
+  user: null,
+  isAuthenticated: false,
   fixedExpenses: [],
   dailyExpenses: [],
   debts: [],
@@ -75,6 +86,19 @@ export const useAppStore = create<AppState>((set, get) => ({
   language: 'en',
   isLoading: false,
   error: null,
+  
+  // Auth Actions
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
+  clearUser: () => set({ 
+    user: null, 
+    isAuthenticated: false,
+    fixedExpenses: [],
+    dailyExpenses: [],
+    debts: [],
+    income: [],
+    investments: [],
+    overviewItems: []
+  }),
   
   // UI Actions
   setCurrentView: (view) => set({ currentView: view }),
@@ -325,3 +349,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   }
 }));
+
+// Export useStore as an alias for backward compatibility
+export const useStore = useAppStore;
