@@ -11,19 +11,23 @@ import {
   Portal,
   Modal,
   TextInput,
-  HelperText
+  HelperText,
+  Surface
 } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '../theme/ThemeContext';
 import { useAppStore } from '../services/store';
 import { FixedExpense, Currency } from '../types';
 import ViewToggle from '../components/ViewToggle';
 import AddButton from '../components/AddButton';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { BarChart } from 'react-native-chart-kit';
+import { PieChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 
 const FixedExpensesScreen: React.FC = () => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const { 
     fixedExpenses, 
     currentView, 
@@ -116,16 +120,22 @@ const FixedExpensesScreen: React.FC = () => {
   };
 
   const getChartData = () => {
-    const screenWidth = Dimensions.get('window').width;
-    return {
-      labels: fixedExpenses.map(expense => 
-        expense.title.length > 8 ? expense.title.substring(0, 8) + '...' : expense.title
-      ),
-      datasets: [{
-        data: fixedExpenses.map(expense => expense.actual),
-        color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`,
-      }]
-    };
+    const colors = [
+      theme.primary,
+      theme.secondary,
+      theme.expense,
+      theme.warning,
+      theme.income,
+      theme.info,
+    ];
+    
+    return fixedExpenses.map((expense, index) => ({
+      name: expense.title.length > 10 ? expense.title.substring(0, 10) + '...' : expense.title,
+      population: expense.actual,
+      color: colors[index % colors.length],
+      legendFontColor: theme.textSecondary,
+      legendFontSize: 12,
+    }));
   };
 
   if (isLoading && fixedExpenses.length === 0) {
@@ -133,7 +143,7 @@ const FixedExpensesScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView style={styles.scrollView}>
         <ViewToggle 
           currentView={currentView} 
@@ -141,110 +151,108 @@ const FixedExpensesScreen: React.FC = () => {
         />
 
         {error && (
-          <Card style={styles.errorCard}>
+          <Card style={[styles.errorCard, { backgroundColor: theme.surface, borderColor: theme.error, borderWidth: 1 }]}>
             <Card.Content>
-              <Text style={styles.errorText}>{error}</Text>
+              <Text style={[styles.errorText, { color: theme.error }]}>{error}</Text>
             </Card.Content>
           </Card>
         )}
 
         {fixedExpenses.length === 0 ? (
-          <Card style={styles.emptyCard}>
-            <Card.Content style={styles.emptyContent}>
-              <Title>{t('fixedExpenses.noExpenses')}</Title>
-              <Paragraph>{t('fixedExpenses.addFirstExpense')}</Paragraph>
+          <Surface style={[styles.emptyCard, { backgroundColor: theme.surface }]}>
+            <View style={styles.emptyContent}>
+              <MaterialIcons name="home" size={64} color={theme.textTertiary} />
+              <Title style={[styles.emptyTitle, { color: theme.text }]}>{t('fixedExpenses.noExpenses')}</Title>
+              <Paragraph style={[styles.emptyParagraph, { color: theme.textSecondary }]}>{t('fixedExpenses.addFirstExpense')}</Paragraph>
               <Button 
                 mode="contained" 
                 onPress={handleAddExpense}
-                style={styles.addButton}
+                style={[styles.addButton, { backgroundColor: theme.primary }]}
+                buttonColor={theme.primary}
               >
                 {t('fixedExpenses.addExpense')}
               </Button>
-            </Card.Content>
-          </Card>
+            </View>
+          </Surface>
         ) : (
           <>
             {currentView === 'table' ? (
-              <Card>
-                <Card.Content>
-                  <DataTable>
-                    <DataTable.Header>
-                      <DataTable.Title>{t('common.title')}</DataTable.Title>
-                      <DataTable.Title>{t('common.date')}</DataTable.Title>
-                      <DataTable.Title>{t('common.planned')}</DataTable.Title>
-                      <DataTable.Title>{t('common.actual')}</DataTable.Title>
-                      <DataTable.Title>Actions</DataTable.Title>
-                    </DataTable.Header>
-
-                    {fixedExpenses.map((expense) => (
-                      <DataTable.Row key={expense.id}>
-                        <DataTable.Cell>{expense.title}</DataTable.Cell>
-                        <DataTable.Cell>{expense.date}</DataTable.Cell>
-                        <DataTable.Cell>
-                          {expense.planned} {expense.currency}
-                        </DataTable.Cell>
-                        <DataTable.Cell>
-                          {expense.actual} {expense.currency}
-                        </DataTable.Cell>
-                        <DataTable.Cell>
-                          <View style={styles.actionButtons}>
-                            <Button 
-                              mode="text" 
-                              onPress={() => handleEditExpense(expense)}
-                              compact
-                            >
-                              {t('common.edit')}
-                            </Button>
-                            <Button 
-                              mode="text" 
-                              onPress={() => handleDeleteExpense(expense)}
-                              compact
-                              textColor="red"
-                            >
-                              {t('common.delete')}
-                            </Button>
+              <View style={styles.cardsContainer}>
+                {fixedExpenses.map((expense) => (
+                  <Surface key={expense.id} style={[styles.expenseCard, { backgroundColor: theme.surface }]}>
+                    <View style={styles.expenseCardHeader}>
+                      <View style={styles.expenseCardTitleRow}>
+                        <MaterialIcons name="home" size={20} color={theme.primary} />
+                        <Text style={[styles.expenseCardTitle, { color: theme.text }]} numberOfLines={1}>
+                          {expense.title}
+                        </Text>
+                      </View>
+                      <View style={styles.actionIcons}>
+                        <Button mode="text" onPress={() => handleEditExpense(expense)} compact textColor={theme.primary} style={styles.actionIconButton} icon={() => <MaterialIcons name="edit" size={18} color={theme.primary} />}>{''}</Button>
+                        <Button mode="text" onPress={() => handleDeleteExpense(expense)} compact textColor={theme.error} style={styles.actionIconButton} icon={() => <MaterialIcons name="delete" size={18} color={theme.error} />}>{''}</Button>
+                      </View>
+                    </View>
+                    <View style={styles.expenseCardContent}>
+                      <View style={[styles.dateBadge, { backgroundColor: theme.surfaceVariant + '20' }]}>
+                        <MaterialIcons name="event" size={16} color={theme.textSecondary} />
+                        <Text style={[styles.dateText, { color: theme.textSecondary }]}>{expense.date}</Text>
+                      </View>
+                      <View style={styles.amountRow}>
+                        <View style={styles.amountGroup}>
+                          <Text style={[styles.amountLabel, { color: theme.textSecondary }]}>
+                            {t('common.planned')}
+                          </Text>
+                          <View style={styles.amountContainer}>
+                            <Text style={[styles.amountValue, { color: theme.text }]}>
+                              {expense.planned.toFixed(2)}
+                            </Text>
+                            <Text style={[styles.currencyText, { color: theme.textSecondary }]}>
+                              {expense.currency}
+                            </Text>
                           </View>
-                        </DataTable.Cell>
-                      </DataTable.Row>
-                    ))}
-                  </DataTable>
-                </Card.Content>
-              </Card>
+                        </View>
+                        <View style={[styles.divider, { backgroundColor: theme.border }]} />
+                        <View style={styles.amountGroup}>
+                          <Text style={[styles.amountLabel, { color: theme.textSecondary }]}>
+                            {t('common.actual')}
+                          </Text>
+                          <View style={styles.amountContainer}>
+                            <Text style={[styles.amountValue, { color: theme.primary }]}>
+                              {expense.actual.toFixed(2)}
+                            </Text>
+                            <Text style={[styles.currencyText, { color: theme.textSecondary }]}>
+                              {expense.currency}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  </Surface>
+                ))}
+              </View>
             ) : (
-              <Card>
-                <Card.Content>
-                  <Title>Expenses Chart</Title>
+              <Surface style={[styles.card, { backgroundColor: theme.surface }]}>
+                <View style={styles.chartContent}>
+                  <Text variant="titleLarge" style={[styles.chartTitle, { color: theme.text }]}>
+                    Fixed Expenses Overview
+                  </Text>
                   <View style={styles.chartContainer}>
-                    <BarChart
+                    <PieChart
                       data={getChartData()}
                       width={Dimensions.get('window').width - 60}
                       height={220}
-                      yAxisLabel=""
-                      yAxisSuffix=""
                       chartConfig={{
-                        backgroundColor: '#ffffff',
-                        backgroundGradientFrom: '#ffffff',
-                        backgroundGradientTo: '#ffffff',
-                        decimalPlaces: 0,
-                        color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`,
-                        labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                        style: {
-                          borderRadius: 16
-                        },
-                        propsForDots: {
-                          r: '6',
-                          strokeWidth: '2',
-                          stroke: '#2196F3'
-                        }
+                        color: (opacity = 1) => theme.textSecondary,
                       }}
-                      style={{
-                        marginVertical: 8,
-                        borderRadius: 16
-                      }}
+                      accessor="population"
+                      backgroundColor="transparent"
+                      paddingLeft="15"
+                      center={[10, 10]}
+                      absolute
                     />
                   </View>
-                </Card.Content>
-              </Card>
+                </View>
+              </Surface>
             )}
           </>
         )}
@@ -256,17 +264,22 @@ const FixedExpensesScreen: React.FC = () => {
         <Modal
           visible={modalVisible}
           onDismiss={() => setModalVisible(false)}
-          contentContainerStyle={styles.modalContent}
+          contentContainerStyle={[styles.modalContent, { backgroundColor: theme.surface }]}
         >
-          <Title>
+          <Text variant="titleLarge" style={[styles.modalTitle, { color: theme.text }]}>
             {editingExpense ? t('fixedExpenses.editExpense') : t('fixedExpenses.addExpense')}
-          </Title>
+          </Text>
           
           <TextInput
             label={t('fixedExpenses.expenseTitle')}
             value={formData.title}
             onChangeText={(text) => setFormData({ ...formData, title: text })}
             style={styles.input}
+            mode="outlined"
+            theme={{ colors: { primary: theme.primary } }}
+            outlineColor={theme.border}
+            activeOutlineColor={theme.primary}
+            textColor={theme.text}
           />
 
           <TextInput
@@ -274,7 +287,11 @@ const FixedExpensesScreen: React.FC = () => {
             value={formData.date}
             onChangeText={(text) => setFormData({ ...formData, date: text })}
             style={styles.input}
-            keyboardType="default"
+            mode="outlined"
+            theme={{ colors: { primary: theme.primary } }}
+            outlineColor={theme.border}
+            activeOutlineColor={theme.primary}
+            textColor={theme.text}
           />
 
           <TextInput
@@ -283,6 +300,11 @@ const FixedExpensesScreen: React.FC = () => {
             onChangeText={(text) => setFormData({ ...formData, planned: text })}
             style={styles.input}
             keyboardType="numeric"
+            mode="outlined"
+            theme={{ colors: { primary: theme.primary } }}
+            outlineColor={theme.border}
+            activeOutlineColor={theme.primary}
+            textColor={theme.text}
           />
 
           <TextInput
@@ -291,6 +313,11 @@ const FixedExpensesScreen: React.FC = () => {
             onChangeText={(text) => setFormData({ ...formData, actual: text })}
             style={styles.input}
             keyboardType="numeric"
+            mode="outlined"
+            theme={{ colors: { primary: theme.primary } }}
+            outlineColor={theme.border}
+            activeOutlineColor={theme.primary}
+            textColor={theme.text}
           />
 
           <View style={styles.modalButtons}>
@@ -298,13 +325,15 @@ const FixedExpensesScreen: React.FC = () => {
               mode="outlined" 
               onPress={() => setModalVisible(false)}
               style={styles.modalButton}
+              buttonColor={theme.border}
             >
               {t('common.cancel')}
             </Button>
             <Button 
               mode="contained" 
               onPress={handleSaveExpense}
-              style={styles.modalButton}
+              style={[styles.modalButton, { backgroundColor: theme.primary }]}
+              buttonColor={theme.primary}
             >
               {t('common.save')}
             </Button>
@@ -318,53 +347,205 @@ const FixedExpensesScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   scrollView: {
     flex: 1,
     padding: 16,
   },
+  card: {
+    borderRadius: 16,
+    marginBottom: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+  },
   emptyCard: {
     marginTop: 20,
+    borderRadius: 16,
+    padding: 32,
   },
   emptyContent: {
     alignItems: 'center',
-    paddingVertical: 40,
+    paddingVertical: 20,
+  },
+  emptyTitle: {
+    marginTop: 16,
+    fontSize: 20,
+    fontWeight: '600' as const,
+  },
+  emptyParagraph: {
+    marginTop: 8,
+    textAlign: 'center',
+    fontSize: 14,
   },
   addButton: {
-    marginTop: 16,
+    marginTop: 24,
+    borderRadius: 12,
+    paddingVertical: 4,
   },
   errorCard: {
-    backgroundColor: '#ffebee',
     marginBottom: 16,
+    borderRadius: 12,
   },
   errorText: {
-    color: '#c62828',
+    fontSize: 14,
+  },
+  tableContent: {
+    padding: 0,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  tableHeaderText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5,
+  },
+  cellText: {
+    fontSize: 14,
+    fontWeight: '500' as const,
+  },
+  dateText: {
+    fontSize: 13,
+    fontWeight: '400' as const,
+  },
+  amountContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 4,
+  },
+  amountText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  currencyText: {
+    fontSize: 11,
+    fontWeight: '400' as const,
+  },
+  chartContent: {
+    padding: 16,
+  },
+  chartTitle: {
+    marginBottom: 16,
+    fontWeight: '600' as const,
+  },
+  chartContainer: {
+    marginTop: 8,
+    alignItems: 'center',
   },
   actionButtons: {
     flexDirection: 'row',
+    gap: 4,
+  },
+  cardsContainer: {
+    gap: 12,
+  },
+  expenseCard: {
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 0,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+  },
+  expenseCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  expenseCardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
     gap: 8,
   },
-  chartContainer: {
-    marginTop: 16,
+  expenseCardTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    flex: 1,
+  },
+  actionIcons: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  actionIconButton: {
+    minWidth: 36,
+    height: 36,
+    borderRadius: 18,
+    margin: 0,
+    padding: 0,
+  },
+  expenseCardContent: {
+    gap: 12,
+  },
+  dateBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    alignSelf: 'center',
+  },
+  dateText: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+  },
+  amountRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-start',
+  },
+  amountGroup: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  amountLabel: {
+    fontSize: 11,
+    fontWeight: '500' as const,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5,
+  },
+  amountValue: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+  },
+  divider: {
+    width: 1,
+    height: 40,
+    marginHorizontal: 16,
+    opacity: 0.3,
   },
   modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
+    padding: 24,
     margin: 20,
-    borderRadius: 8,
+    borderRadius: 16,
+    elevation: 8,
+  },
+  modalTitle: {
+    marginBottom: 20,
+    fontWeight: '600' as const,
   },
   input: {
     marginBottom: 16,
+    backgroundColor: 'transparent',
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 20,
+    marginTop: 24,
+    gap: 12,
   },
   modalButton: {
     flex: 1,
-    marginHorizontal: 8,
+    borderRadius: 12,
   },
 });
 

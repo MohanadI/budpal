@@ -9,19 +9,23 @@ import {
   Text,
   Portal,
   Modal,
-  TextInput
+  TextInput,
+  Surface
 } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '../theme/ThemeContext';
 import { useAppStore } from '../services/store';
 import { Income, Currency } from '../types';
 import ViewToggle from '../components/ViewToggle';
 import AddButton from '../components/AddButton';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { BarChart } from 'react-native-chart-kit';
+import { PieChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 
 const IncomeScreen: React.FC = () => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const { 
     income, 
     currentView, 
@@ -110,15 +114,22 @@ const IncomeScreen: React.FC = () => {
   };
 
   const getChartData = () => {
-    return {
-      labels: income.map(incomeItem => 
-        incomeItem.title.length > 8 ? incomeItem.title.substring(0, 8) + '...' : incomeItem.title
-      ),
-      datasets: [{
-        data: income.map(incomeItem => incomeItem.actual),
-        color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`,
-      }]
-    };
+    const colors = [
+      theme.primary,
+      theme.secondary,
+      theme.income,
+      theme.success,
+      theme.warning,
+      theme.info,
+    ];
+    
+    return income.map((incomeItem, index) => ({
+      name: incomeItem.title.length > 10 ? incomeItem.title.substring(0, 10) + '...' : incomeItem.title,
+      population: incomeItem.actual,
+      color: colors[index % colors.length],
+      legendFontColor: theme.textSecondary,
+      legendFontSize: 12,
+    }));
   };
 
   if (isLoading && income.length === 0) {
@@ -126,7 +137,7 @@ const IncomeScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView style={styles.scrollView}>
         <ViewToggle 
           currentView={currentView} 
@@ -134,108 +145,132 @@ const IncomeScreen: React.FC = () => {
         />
 
         {error && (
-          <Card style={styles.errorCard}>
+          <Card style={[styles.errorCard, { backgroundColor: theme.surface, borderColor: theme.error, borderWidth: 1 }]}>
             <Card.Content>
-              <Text style={styles.errorText}>{error}</Text>
+              <Text style={[styles.errorText, { color: theme.error }]}>{error}</Text>
             </Card.Content>
           </Card>
         )}
 
         {income.length === 0 ? (
-          <Card style={styles.emptyCard}>
-            <Card.Content style={styles.emptyContent}>
-              <Title>{t('income.noIncome')}</Title>
-              <Paragraph>{t('income.addFirstIncome')}</Paragraph>
+          <Surface style={[styles.emptyCard, { backgroundColor: theme.surface }]}>
+            <View style={styles.emptyContent}>
+              <MaterialIcons name="attach-money" size={64} color={theme.textTertiary} />
+              <Title style={[styles.emptyTitle, { color: theme.text }]}>{t('income.noIncome')}</Title>
+              <Paragraph style={[styles.emptyParagraph, { color: theme.textSecondary }]}>{t('income.addFirstIncome')}</Paragraph>
               <Button 
                 mode="contained" 
                 onPress={handleAddIncome}
-                style={styles.addButton}
+                style={[styles.addButton, { backgroundColor: theme.primary }]}
+                buttonColor={theme.primary}
               >
                 {t('income.addIncome')}
               </Button>
-            </Card.Content>
-          </Card>
+            </View>
+          </Surface>
         ) : (
           <>
             {currentView === 'table' ? (
-              <Card>
-                <Card.Content>
-                  <DataTable>
-                    <DataTable.Header>
-                      <DataTable.Title>{t('common.title')}</DataTable.Title>
-                      <DataTable.Title>{t('income.expectedIncome')}</DataTable.Title>
-                      <DataTable.Title>{t('income.actualIncome')}</DataTable.Title>
-                      <DataTable.Title>Actions</DataTable.Title>
-                    </DataTable.Header>
-
-                    {income.map((incomeItem) => (
-                      <DataTable.Row key={incomeItem.id}>
-                        <DataTable.Cell>{incomeItem.title}</DataTable.Cell>
-                        <DataTable.Cell>
-                          {incomeItem.planned} {incomeItem.currency}
-                        </DataTable.Cell>
-                        <DataTable.Cell>
-                          {incomeItem.actual} {incomeItem.currency}
-                        </DataTable.Cell>
-                        <DataTable.Cell>
-                          <View style={styles.actionButtons}>
-                            <Button 
-                              mode="text" 
-                              onPress={() => handleEditIncome(incomeItem)}
-                              compact
-                            >
-                              {t('common.edit')}
-                            </Button>
-                            <Button 
-                              mode="text" 
-                              onPress={() => handleDeleteIncome(incomeItem)}
-                              compact
-                              textColor="red"
-                            >
-                              {t('common.delete')}
-                            </Button>
+              <View style={styles.cardsContainer}>
+                {income.map((incomeItem) => (
+                  <Surface key={incomeItem.id} style={[styles.incomeCard, { backgroundColor: theme.surface }]}>
+                    <View style={styles.incomeCardHeader}>
+                      <View style={styles.incomeCardTitleRow}>
+                        <MaterialIcons name="attach-money" size={20} color={theme.primary} />
+                        <Text style={[styles.incomeCardTitle, { color: theme.text }]} numberOfLines={1}>
+                          {incomeItem.title}
+                        </Text>
+                      </View>
+                      <View style={styles.actionIcons}>
+                        <Button 
+                          mode="text"
+                          onPress={() => handleEditIncome(incomeItem)}
+                          compact
+                          textColor={theme.primary}
+                          style={styles.actionIconButton}
+                          icon={() => <MaterialIcons name="edit" size={18} color={theme.primary} />}
+                        >
+                          {''}
+                        </Button>
+                        <Button 
+                          mode="text"
+                          onPress={() => handleDeleteIncome(incomeItem)}
+                          compact
+                          textColor={theme.error}
+                          style={styles.actionIconButton}
+                          icon={() => <MaterialIcons name="delete" size={18} color={theme.error} />}
+                        >
+                          {''}
+                        </Button>
+                      </View>
+                    </View>
+                    <View style={styles.incomeCardContent}>
+                      <View style={styles.amountRow}>
+                        <View style={styles.amountGroup}>
+                          <Text style={[styles.amountLabel, { color: theme.textSecondary }]}>
+                            {t('income.expectedIncome')}
+                          </Text>
+                          <View style={styles.amountContainer}>
+                            <Text style={[styles.amountValue, { color: theme.text }]}>
+                              {incomeItem.planned.toFixed(2)}
+                            </Text>
+                            <Text style={[styles.currencyText, { color: theme.textSecondary }]}>
+                              {incomeItem.currency}
+                            </Text>
                           </View>
-                        </DataTable.Cell>
-                      </DataTable.Row>
-                    ))}
-                  </DataTable>
-                </Card.Content>
-              </Card>
+                        </View>
+                        <View style={[styles.divider, { backgroundColor: theme.border }]} />
+                        <View style={styles.amountGroup}>
+                          <Text style={[styles.amountLabel, { color: theme.textSecondary }]}>
+                            {t('income.actualIncome')}
+                          </Text>
+                          <View style={styles.amountContainer}>
+                            <Text style={[styles.amountValue, { color: theme.income }]}>
+                              {incomeItem.actual.toFixed(2)}
+                            </Text>
+                            <Text style={[styles.currencyText, { color: theme.textSecondary }]}>
+                              {incomeItem.currency}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                      <View style={[styles.differenceBadge, { 
+                        backgroundColor: theme.income + '15',
+                        borderColor: theme.income
+                      }]}>
+                        <MaterialIcons name="trending-up" size={16} color={theme.income} />
+                        <Text style={[styles.differenceText, { color: theme.income }]}>
+                          {(incomeItem.actual - incomeItem.planned >= 0 ? '+' : '')}
+                          {(incomeItem.actual - incomeItem.planned).toFixed(2)} {incomeItem.currency}
+                        </Text>
+                      </View>
+                    </View>
+                  </Surface>
+                ))}
+              </View>
             ) : (
-              <Card>
-                <Card.Content>
-                  <Title>Income Chart</Title>
+              <Surface style={[styles.card, { backgroundColor: theme.surface }]}>
+                <View style={styles.chartContent}>
+                  <Text variant="titleLarge" style={[styles.chartTitle, { color: theme.text }]}>
+                    Income Overview
+                  </Text>
                   <View style={styles.chartContainer}>
-                    <BarChart
+                    <PieChart
                       data={getChartData()}
                       width={Dimensions.get('window').width - 60}
                       height={220}
-                      yAxisLabel=""
-                      yAxisSuffix=""
                       chartConfig={{
-                        backgroundColor: '#ffffff',
-                        backgroundGradientFrom: '#ffffff',
-                        backgroundGradientTo: '#ffffff',
-                        decimalPlaces: 0,
-                        color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`,
-                        labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                        style: {
-                          borderRadius: 16
-                        },
-                        propsForDots: {
-                          r: '6',
-                          strokeWidth: '2',
-                          stroke: '#4CAF50'
-                        }
+                        color: (opacity = 1) => theme.textSecondary,
                       }}
-                      style={{
-                        marginVertical: 8,
-                        borderRadius: 16
-                      }}
+                      accessor="population"
+                      backgroundColor="transparent"
+                      paddingLeft="15"
+                      center={[10, 10]}
+                      absolute
                     />
                   </View>
-                </Card.Content>
-              </Card>
+                </View>
+              </Surface>
             )}
           </>
         )}
@@ -247,17 +282,22 @@ const IncomeScreen: React.FC = () => {
         <Modal
           visible={modalVisible}
           onDismiss={() => setModalVisible(false)}
-          contentContainerStyle={styles.modalContent}
+          contentContainerStyle={[styles.modalContent, { backgroundColor: theme.surface }]}
         >
-          <Title>
+          <Text variant="titleLarge" style={[styles.modalTitle, { color: theme.text }]}>
             {editingIncome ? t('income.editIncome') : t('income.addIncome')}
-          </Title>
+          </Text>
           
           <TextInput
             label={t('income.incomeSource')}
             value={formData.title}
             onChangeText={(text) => setFormData({ ...formData, title: text })}
             style={styles.input}
+            mode="outlined"
+            theme={{ colors: { primary: theme.primary } }}
+            outlineColor={theme.border}
+            activeOutlineColor={theme.primary}
+            textColor={theme.text}
           />
 
           <TextInput
@@ -266,6 +306,11 @@ const IncomeScreen: React.FC = () => {
             onChangeText={(text) => setFormData({ ...formData, planned: text })}
             style={styles.input}
             keyboardType="numeric"
+            mode="outlined"
+            theme={{ colors: { primary: theme.primary } }}
+            outlineColor={theme.border}
+            activeOutlineColor={theme.primary}
+            textColor={theme.text}
           />
 
           <TextInput
@@ -274,6 +319,11 @@ const IncomeScreen: React.FC = () => {
             onChangeText={(text) => setFormData({ ...formData, actual: text })}
             style={styles.input}
             keyboardType="numeric"
+            mode="outlined"
+            theme={{ colors: { primary: theme.primary } }}
+            outlineColor={theme.border}
+            activeOutlineColor={theme.primary}
+            textColor={theme.text}
           />
 
           <View style={styles.modalButtons}>
@@ -281,13 +331,15 @@ const IncomeScreen: React.FC = () => {
               mode="outlined" 
               onPress={() => setModalVisible(false)}
               style={styles.modalButton}
+              buttonColor={theme.border}
             >
               {t('common.cancel')}
             </Button>
             <Button 
               mode="contained" 
               onPress={handleSaveIncome}
-              style={styles.modalButton}
+              style={[styles.modalButton, { backgroundColor: theme.primary }]}
+              buttonColor={theme.primary}
             >
               {t('common.save')}
             </Button>
@@ -301,53 +353,208 @@ const IncomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   scrollView: {
     flex: 1,
     padding: 16,
   },
+  card: {
+    borderRadius: 16,
+    marginBottom: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+  },
   emptyCard: {
     marginTop: 20,
+    borderRadius: 16,
+    padding: 32,
   },
   emptyContent: {
     alignItems: 'center',
-    paddingVertical: 40,
+    paddingVertical: 20,
+  },
+  emptyTitle: {
+    marginTop: 16,
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  emptyParagraph: {
+    marginTop: 8,
+    textAlign: 'center',
+    fontSize: 14,
   },
   addButton: {
-    marginTop: 16,
+    marginTop: 24,
+    borderRadius: 12,
+    paddingVertical: 4,
   },
   errorCard: {
-    backgroundColor: '#ffebee',
     marginBottom: 16,
+    borderRadius: 12,
   },
   errorText: {
-    color: '#c62828',
+    fontSize: 14,
+  },
+  tableContent: {
+    padding: 0,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  tableHeaderText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5,
+  },
+  cellText: {
+    fontSize: 14,
+    fontWeight: '500' as const,
+  },
+  amountContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 4,
+  },
+  amountText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  currencyText: {
+    fontSize: 11,
+    fontWeight: '400' as const,
+  },
+  chartContent: {
+    padding: 16,
+  },
+  chartTitle: {
+    marginBottom: 16,
+    fontWeight: '600',
+  },
+  chartContainer: {
+    marginTop: 8,
+    alignItems: 'center',
   },
   actionButtons: {
     flexDirection: 'row',
+    gap: 4,
+  },
+  actionButton: {
+    minWidth: 60,
+  },
+  cardsContainer: {
+    gap: 12,
+  },
+  incomeCard: {
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 0,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+  },
+  incomeCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  incomeCardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
     gap: 8,
   },
-  chartContainer: {
-    marginTop: 16,
+  incomeCardTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    flex: 1,
+  },
+  actionIcons: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  actionIconButton: {
+    minWidth: 36,
+    height: 36,
+    borderRadius: 18,
+    margin: 0,
+    padding: 0,
+  },
+  actionIconLabel: {
+    marginHorizontal: 0,
+    marginVertical: 0,
+  },
+  incomeCardContent: {
+    gap: 12,
+  },
+  amountRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-start',
+  },
+  amountGroup: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  amountLabel: {
+    fontSize: 11,
+    fontWeight: '500' as const,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5,
+  },
+  amountValue: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+  },
+  divider: {
+    width: 1,
+    height: 40,
+    marginHorizontal: 16,
+    opacity: 0.3,
+  },
+  differenceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  differenceText: {
+    fontSize: 14,
+    fontWeight: '700' as const,
   },
   modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
+    padding: 24,
     margin: 20,
-    borderRadius: 8,
+    borderRadius: 16,
+    elevation: 8,
+  },
+  modalTitle: {
+    marginBottom: 20,
+    fontWeight: '600',
   },
   input: {
     marginBottom: 16,
+    backgroundColor: 'transparent',
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 20,
+    marginTop: 24,
+    gap: 12,
   },
   modalButton: {
     flex: 1,
-    marginHorizontal: 8,
+    borderRadius: 12,
   },
 });
 

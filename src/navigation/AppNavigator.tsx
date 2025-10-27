@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, I18nManager } from 'react-native';
+import { View, StyleSheet, I18nManager, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppStore } from '../services/store';
 import { authService } from '../services/auth';
 import { useTheme } from '../theme/ThemeContext';
@@ -30,6 +31,7 @@ const TabNavigator = () => {
   const { t, i18n } = useTranslation();
   const { language } = useAppStore();
   const { theme, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
   const isRTL = i18n.language === 'ar';
 
   // Update RTL layout when language changes
@@ -76,16 +78,16 @@ const TabNavigator = () => {
         tabBarInactiveTintColor: theme.tabBarInactive,
         headerStyle: {
           backgroundColor: theme.headerBackground,
-          elevation: 4,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.border,
         },
         headerTintColor: theme.headerText,
         headerTitleStyle: {
-          fontWeight: 'bold',
+          fontWeight: '600',
           fontSize: 18,
+          color: theme.headerText,
         },
         headerRight: () => (
           <View style={[styles.headerRight, isRTL && styles.headerRightRTL]}>
@@ -97,20 +99,28 @@ const TabNavigator = () => {
         tabBarStyle: {
           direction: isRTL ? 'rtl' : 'ltr',
           backgroundColor: theme.tabBarBackground,
+          borderTopWidth: isDark ? 0 : 1,
           borderTopColor: theme.border,
           elevation: 8,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
+          shadowOffset: { width: 0, height: -4 },
           shadowOpacity: 0.1,
-          shadowRadius: 4,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 8,
+          shadowRadius: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: Math.max(insets.bottom, 12),
+          paddingTop: 10,
         },
         tabBarLabelStyle: {
           textAlign: isRTL ? 'right' : 'left',
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
+          marginTop: 4,
+        },
+        tabBarIconStyle: {
+          marginTop: 2,
+        },
+        sceneContainerStyle: {
+          backgroundColor: theme.background,
         },
       })}
     >
@@ -149,22 +159,24 @@ const TabNavigator = () => {
 };
 
 const AuthStack = () => {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   
   return (
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: theme.primary,
-          elevation: 4,
+          backgroundColor: isDark ? theme.surface : theme.primary,
+          elevation: isDark ? 0 : 4,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
+          shadowOpacity: isDark ? 0 : 0.1,
           shadowRadius: 4,
+          borderBottomWidth: isDark ? 1 : 0,
+          borderBottomColor: theme.border,
         },
-        headerTintColor: '#fff',
+        headerTintColor: isDark ? theme.text : '#fff',
         headerTitleStyle: {
-          fontWeight: 'bold',
+          fontWeight: '600',
         },
       }}
     >

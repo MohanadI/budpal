@@ -56,12 +56,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   };
 
   return (
-    <LinearGradient
-      colors={[theme.gradientStart, theme.gradientEnd]}
-      style={styles.gradient}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <View style={[styles.fullContainer, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -159,12 +154,12 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
           </Surface>
         </ScrollView>
       </KeyboardAvoidingView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gradient: {
+  fullContainer: {
     flex: 1,
   },
   container: {
@@ -187,41 +182,41 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   iconWrapper: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   surface: {
-    padding: 28,
-    borderRadius: 24,
+    padding: 24,
+    borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   title: {
     textAlign: 'center',
     marginBottom: 8,
-    fontWeight: 'bold',
+    fontWeight: '600',
     writingDirection: 'auto',
-    fontSize: 28,
+    fontSize: 24,
   },
   subtitle: {
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
     writingDirection: 'auto',
-    fontSize: 16,
+    fontSize: 15,
   },
   input: {
-    marginBottom: 16,
+    marginBottom: 12,
     writingDirection: 'auto',
     backgroundColor: 'transparent',
   },
@@ -233,11 +228,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingVertical: 8,
     borderRadius: 12,
-    elevation: 4,
+    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   registerContainer: {
     flexDirection: 'row',

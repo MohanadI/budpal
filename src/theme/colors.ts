@@ -1,108 +1,108 @@
 // Theme colors for BudPal app
 export const lightTheme = {
-  // Primary colors
-  primary: '#6C5CE7',
-  primaryDark: '#5F3DC4',
-  primaryLight: '#A29BFE',
+  // Primary colors - Modern blue
+  primary: '#3B82F6',
+  primaryDark: '#2563EB',
+  primaryLight: '#60A5FA',
   
   // Secondary colors
-  secondary: '#00B894',
-  secondaryDark: '#00997A',
-  secondaryLight: '#55EFC4',
+  secondary: '#10B981',
+  secondaryDark: '#059669',
+  secondaryLight: '#34D399',
   
-  // Background colors
-  background: '#F8F9FA',
-  surface: '#FFFFFF',
+  // Background colors - Clean light theme
+  background: '#FFFFFF',
+  surface: '#F8F9FA',
   surfaceVariant: '#F1F3F5',
   
   // Text colors
-  text: '#2D3436',
-  textSecondary: '#636E72',
-  textTertiary: '#B2BEC3',
+  text: '#1F2937',
+  textSecondary: '#6B7280',
+  textTertiary: '#9CA3AF',
   
   // Status colors
-  success: '#00B894',
-  warning: '#FDCB6E',
-  error: '#FF7675',
-  info: '#74B9FF',
+  success: '#10B981',
+  warning: '#F59E0B',
+  error: '#EF4444',
+  info: '#3B82F6',
   
   // Card colors
   card: '#FFFFFF',
-  cardShadow: 'rgba(45, 52, 54, 0.1)',
+  cardShadow: 'rgba(0, 0, 0, 0.05)',
   
   // Border colors
-  border: '#DFE6E9',
-  borderLight: '#F1F3F5',
+  border: '#E5E7EB',
+  borderLight: '#F3F4F6',
   
   // Income/Expense colors
-  income: '#00B894',
-  expense: '#FF7675',
+  income: '#10B981',
+  expense: '#EF4444',
   
   // Gradient colors
-  gradientStart: '#6C5CE7',
-  gradientEnd: '#A29BFE',
+  gradientStart: '#3B82F6',
+  gradientEnd: '#60A5FA',
   
   // Tab bar
   tabBarBackground: '#FFFFFF',
-  tabBarActive: '#6C5CE7',
-  tabBarInactive: '#B2BEC3',
+  tabBarActive: '#3B82F6',
+  tabBarInactive: '#6B7280',
   
   // Header
-  headerBackground: '#6C5CE7',
-  headerText: '#FFFFFF',
+  headerBackground: '#FFFFFF',
+  headerText: '#1F2937',
 };
 
 export const darkTheme = {
-  // Primary colors
-  primary: '#A29BFE',
-  primaryDark: '#6C5CE7',
-  primaryLight: '#D1CCFF',
+  // Primary colors - Modern blue
+  primary: '#60A5FA',
+  primaryDark: '#3B82F6',
+  primaryLight: '#93C5FD',
   
   // Secondary colors
-  secondary: '#55EFC4',
-  secondaryDark: '#00B894',
-  secondaryLight: '#81ECDB',
+  secondary: '#34D399',
+  secondaryDark: '#10B981',
+  secondaryLight: '#6EE7B7',
   
-  // Background colors
-  background: '#0F1419',
-  surface: '#1A1F2E',
-  surfaceVariant: '#252B3B',
+  // Background colors - Modern dark theme
+  background: '#0F172A',
+  surface: '#1E293B',
+  surfaceVariant: '#334155',
   
   // Text colors
-  text: '#E8EAED',
-  textSecondary: '#B2BAC2',
-  textTertiary: '#6C7589',
+  text: '#F8FAFC',
+  textSecondary: '#CBD5E1',
+  textTertiary: '#94A3B8',
   
   // Status colors
-  success: '#55EFC4',
-  warning: '#FDCB6E',
-  error: '#FF7675',
-  info: '#74B9FF',
+  success: '#34D399',
+  warning: '#FBBF24',
+  error: '#F87171',
+  info: '#60A5FA',
   
   // Card colors
-  card: '#1A1F2E',
+  card: '#1E293B',
   cardShadow: 'rgba(0, 0, 0, 0.4)',
   
   // Border colors
-  border: '#2C3446',
-  borderLight: '#252B3B',
+  border: 'rgba(255, 255, 255, 0.1)',
+  borderLight: 'rgba(255, 255, 255, 0.05)',
   
   // Income/Expense colors
-  income: '#55EFC4',
-  expense: '#FF7675',
+  income: '#34D399',
+  expense: '#F87171',
   
   // Gradient colors
-  gradientStart: '#6C5CE7',
-  gradientEnd: '#A29BFE',
+  gradientStart: '#1E293B',
+  gradientEnd: '#334155',
   
   // Tab bar
-  tabBarBackground: '#1A1F2E',
-  tabBarActive: '#A29BFE',
-  tabBarInactive: '#6C7589',
+  tabBarBackground: '#1E293B',
+  tabBarActive: '#60A5FA',
+  tabBarInactive: '#64748B',
   
   // Header
-  headerBackground: '#1A1F2E',
-  headerText: '#E8EAED',
+  headerBackground: '#1E293B',
+  headerText: '#F8FAFC',
 };
 
 export type Theme = typeof lightTheme;

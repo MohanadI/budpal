@@ -1,14 +1,16 @@
 import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { I18nManager } from "react-native";
+import { I18nManager, View } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "./src/utils/i18n";
 import AppNavigator from "./src/navigation/AppNavigator";
 import i18n from "./src/utils/i18n";
-import { ThemeProvider } from "./src/theme/ThemeContext";
+import { ThemeProvider, useTheme } from "./src/theme/ThemeContext";
 
-export default function App() {
+function AppContent() {
+  const { isDark, theme } = useTheme();
+  
   useEffect(() => {
     // Enable RTL for Arabic
     const isRTL = i18n.language === 'ar';
@@ -31,11 +33,19 @@ export default function App() {
   }, []);
 
   return (
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
+      <StatusBar style={isDark ? "light" : "dark"} backgroundColor={theme.background} />
+      <AppNavigator />
+    </View>
+  );
+}
+
+export default function App() {
+  return (
     <SafeAreaProvider>
       <ThemeProvider>
         <PaperProvider>
-          <AppNavigator />
-          <StatusBar style="auto" />
+          <AppContent />
         </PaperProvider>
       </ThemeProvider>
     </SafeAreaProvider>
